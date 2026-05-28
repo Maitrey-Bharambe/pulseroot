@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+:root {
+  --background: #F8D4C8;
+  --foreground: #1E2B14;
+  --color-primary: #2D411B;
+  --color-secondary: #4A5E2B;
+  --color-dark: #1E2B14;
+  --color-terracotta: #B55441;
+  --color-sand: #FBF7F5;
+  --color-earth-grey: #8B7B75;
+  --color-charcoal: #3E3A39;
+  --color-gold: #C5A158;
+  --color-muted-rose: #F1B9A7;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--color-primary);
+  --color-secondary: var(--color-secondary);
+  --color-dark: var(--color-dark);
+  --color-terracotta: var(--color-terracotta);
+  --color-sand: var(--color-sand);
+  --color-earth-grey: var(--color-earth-grey);
+  --color-charcoal: var(--color-charcoal);
+  --color-gold: var(--color-gold);
+  --color-muted-rose: var(--color-muted-rose);
+  
+  --font-sans: 'Inter', system-ui, sans-serif;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  margin: 0;
+}
+
+/* Glassmorphism custom styling utilities */
+.glass-panel {
+  background: rgba(251, 247, 245, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(251, 247, 245, 0.3);
+  box-shadow: 0 8px 32px 0 rgba(30, 43, 20, 0.05);
+}
+
+.glass-panel-dark {
+  background: rgba(30, 43, 20, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(251, 247, 245, 0.1);
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.2);
+}
+
+.organic-gradient {
+  background: linear-gradient(135deg, #2D411B 0%, #4A5E2B 100%);
+}
+
+.sunset-gradient {
+  background: linear-gradient(135deg, #B55441 0%, #F1B9A7 100%);
+}
+
+/* Hide scrollbar utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
