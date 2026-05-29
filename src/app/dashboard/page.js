@@ -162,6 +162,84 @@ export default function Dashboard() {
     { name: 'Wet (60 - 100%)', value: 20, color: '#5293B8' }
   ];
 
+  // Helper to format and download telemetry data as a CSV file
+  const handleExportCSV = () => {
+    if (!telemetry || telemetry.length === 0) {
+      alert('No telemetry data available to export.');
+      return;
+    }
+
+    // CSV Column Headers
+    const headers = [
+      'Timestamp',
+      'Device Name',
+      'Device ID',
+      'Temperature (°C)',
+      'Humidity (%)',
+      'Soil Moisture (%)',
+      'Light Value (LDR)',
+      'Light Status',
+      'Pump Status (LED)',
+      'Environment Condition'
+    ];
+
+    // Helper to safely format and escape CSV fields
+    const escapeCSV = (val) => {
+      if (val === null || val === undefined) return '';
+      const stringified = String(val);
+      if (stringified.includes(',') || stringified.includes('"') || stringified.includes('\n')) {
+        return `"${stringified.replace(/"/g, '""')}"`;
+      }
+      return stringified;
+    };
+
+    // Transform each telemetry log entry to a CSV row
+    const rows = telemetry.map((log) => {
+      // Calculate moisture using the same lightValue conversion
+      const moisture = Math.round(100 - (log.lightValue / 1023) * 100);
+      const formattedTime = new Date(log.timestamp).toLocaleString();
+      const devName = activeDeviceDetails?.deviceName || 'PulseRoot - Node 01';
+      const devId = activeDeviceId || 'ESP32_001';
+
+      return [
+        formattedTime,
+        devName,
+        devId,
+        log.temperature,
+        log.humidity,
+        moisture,
+        log.lightValue,
+        log.lightStatus,
+        log.ledStatus ? 'ON' : 'OFF',
+        log.environmentCondition
+      ].map(escapeCSV).join(',');
+    });
+
+    // Combine headers and rows
+    const csvContent = [headers.join(','), ...rows].join('\n');
+    
+    // Create download trigger
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+
+    // Create a descriptive file name: <device_name>_telemetry_<date>.csv
+    const sanitizedDeviceName = (activeDeviceDetails?.deviceName || 'Device')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '_')
+      .replace(/^_+|_+$/g, '');
+    const dateStr = new Date().toISOString().split('T')[0];
+
+    link.href = url;
+    link.setAttribute('download', `${sanitizedDeviceName}_telemetry_${dateStr}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    
+    // Clean up
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div 
       className="flex-grow w-full px-8 py-8 flex flex-col gap-6 select-none"
@@ -286,7 +364,7 @@ export default function Dashboard() {
         <div className="flex items-center gap-3 self-start sm:self-auto">
           
           <button 
-            onClick={() => router.push('/ai-analysis')}
+            onClick={handleExportCSV}
             className="px-5 py-2.5 rounded-xl bg-white/40 hover:bg-white/60 backdrop-blur-md text-xs font-bold tracking-wide text-primary border border-sand/45 shadow-sm transition-all duration-200 flex items-center gap-2"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
