@@ -10,7 +10,10 @@ export default function Home() {
   const [ambientLightMode, setAmbientLightMode] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    const timer = setTimeout(() => {
+      setMounted(true);
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   // Retrieve live metrics from the store (powered by ThingSpeak feeds)

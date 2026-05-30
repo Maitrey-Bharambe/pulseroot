@@ -3,6 +3,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useStore } from '@/lib/useStore';
 
+// Top-level helper function for pure ID generation
+const generateId = () => {
+  return `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+};
+
 export default function Chat() {
   const { activeDeviceId, devices } = useStore();
   const [messages, setMessages] = useState([
@@ -32,7 +37,7 @@ export default function Chat() {
     if (!queryText.trim() || loading) return;
 
     // Add user message
-    const userMsg = { id: Math.random().toString(), sender: 'user', text: queryText };
+    const userMsg = { id: generateId(), sender: 'user', text: queryText };
     setMessages((prev) => [...prev, userMsg]);
     setInput('');
     setLoading(true);
@@ -51,19 +56,19 @@ export default function Chat() {
       if (res.ok && data.success) {
         setMessages((prev) => [
           ...prev,
-          { id: Math.random().toString(), sender: 'ai', text: data.reply }
+          { id: generateId(), sender: 'ai', text: data.reply }
         ]);
       } else {
         setMessages((prev) => [
           ...prev,
-          { id: Math.random().toString(), sender: 'ai', text: 'Handshake timeout: I could not contact the agronomic core. Please check device status.' }
+          { id: generateId(), sender: 'ai', text: 'Handshake timeout: I could not contact the agronomic core. Please check device status.' }
         ]);
       }
     } catch (err) {
       console.error('Chat failed:', err);
       setMessages((prev) => [
         ...prev,
-        { id: Math.random().toString(), sender: 'ai', text: 'Handshake timeout: connection to security gateway failed.' }
+        { id: generateId(), sender: 'ai', text: 'Handshake timeout: connection to security gateway failed.' }
       ]);
     } finally {
       setLoading(false);

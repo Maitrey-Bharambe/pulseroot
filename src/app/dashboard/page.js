@@ -19,6 +19,23 @@ import {
   CartesianGrid
 } from 'recharts';
 
+// Custom tooltips for graphs defined outside the component to keep component pure
+const CustomTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-[#1C3B2B] text-white p-3 rounded-2xl border border-white/10 text-[10px] leading-tight font-bold shadow-lg">
+        <p className="uppercase tracking-wider mb-1 opacity-75">{label}</p>
+        {payload.map((item, idx) => (
+          <p key={idx}>
+            {item.name}: {item.value}
+          </p>
+        ))}
+      </div>
+    );
+  }
+  return null;
+};
+
 export default function Dashboard() {
   const {
     devices,
@@ -37,7 +54,10 @@ export default function Dashboard() {
   const [loadingData, setLoadingData] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    const timer = setTimeout(() => {
+      setMounted(true);
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
@@ -72,14 +92,19 @@ export default function Dashboard() {
       }
     }
 
-    setLoadingData(true);
-    fetchData().finally(() => setLoadingData(false));
+    const timer = setTimeout(() => {
+      setLoadingData(true);
+      fetchData().finally(() => setLoadingData(false));
+    }, 0);
 
     const pollInterval = setInterval(() => {
       fetchData();
     }, 12000);
 
-    return () => clearInterval(pollInterval);
+    return () => {
+      clearTimeout(timer);
+      clearInterval(pollInterval);
+    };
   }, [activeDeviceId, telemetry.length]);
 
   // Extract latest metrics
@@ -138,22 +163,7 @@ export default function Dashboard() {
     role: 'Admin'
   };
 
-  // Custom tooltips for graphs
-  const CustomTooltip = ({ active, payload, label }) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-[#1C3B2B] text-white p-3 rounded-2xl border border-white/10 text-[10px] leading-tight font-bold shadow-lg">
-          <p className="uppercase tracking-wider mb-1 opacity-75">{label}</p>
-          {payload.map((item, idx) => (
-            <p key={idx}>
-              {item.name}: {item.value}
-            </p>
-          ))}
-        </div>
-      );
-    }
-    return null;
-  };
+
 
   // Pie chart data matching Soil Moisture Distribution
   const pieData = [

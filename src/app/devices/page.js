@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useStore } from '@/lib/useStore';
 
 export default function Devices() {
@@ -21,7 +21,7 @@ export default function Devices() {
   const [editLocation, setEditLocation] = useState('');
 
   // Fetch latest devices on load
-  const refreshDevices = async () => {
+  const refreshDevices = useCallback(async () => {
     try {
       const res = await fetch('/api/device/register');
       if (res.ok) {
@@ -31,11 +31,11 @@ export default function Devices() {
     } catch (e) {
       console.error('Failed refreshing devices:', e);
     }
-  };
+  }, [setDevices]);
 
   useEffect(() => {
     refreshDevices();
-  }, []);
+  }, [refreshDevices]);
 
   const handleRegister = async (e) => {
     e.preventDefault();
